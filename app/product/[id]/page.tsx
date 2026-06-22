@@ -14,7 +14,6 @@ type Product = {
   brand: string;
   material: string;
   description: string;
-  image_url: string;
 };
 
 type Size = {
@@ -23,57 +22,61 @@ type Size = {
   stock: number;
 };
 
+type Image = {
+  id: number;
+  image_url: string;
+};
+
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
   const { addToCart } = useCart();
-
   const productId = Number(params.id);
 
   const [product, setProduct] = useState<Product | null>(null);
   const [sizes, setSizes] = useState<Size[]>([]);
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
+  const [images, setImages] = useState<Image[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<Size | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProduct();
-    fetchSizes();
+    fetchAll();
   }, []);
 
-  async function fetchProduct() {
-    const { data } = await supabase
+  async function fetchAll() {
+    const { data: productData } = await supabase
       .from("products")
       .select("*")
       .eq("id", productId)
       .single();
 
-    setProduct(data);
-  }
-
-  async function fetchSizes() {
-    const { data } = await supabase
+    const { data: sizeData } = await supabase
       .from("product_sizes")
       .select("*")
       .eq("product_id", productId);
 
-    setSizes(data || []);
+    const { data: imageData } = await supabase
+      .from("product_images")
+      .select("*")
+      .eq("product_id", productId);
+
+    setProduct(productData);
+    setSizes(sizeData || []);
+    setImages(imageData || []);
+
+    if (imageData && imageData.length > 0) {
+      setSelectedImage(imageData[0].image_url);
+    }
+
     setLoading(false);
   }
 
-  if (loading) {
+  if (loading || !product) {
     return (
       <main className="min-h-screen">
         <Header />
         <div className="p-6">Загрузка...</div>
-      </main>
-    );
-  }
-
-  if (!product) {
-    return (
-      <main className="min-h-screen">
-        <Header />
-        <div className="p-6">Товар не найден</div>
       </main>
     );
   }
@@ -85,7 +88,7 @@ export default function ProductPage() {
       id: product.id,
       name: product.name,
       price: product.price,
-      size: selectedSize,
+      size: selectedSize.size,
     });
 
     router.push("/cart");
@@ -105,83 +108,93 @@ export default function ProductPage() {
           Назад
         </button>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
 
-          <div className="h-72 rounded-xl overflow-hidden mb-6">
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {/* Главное фото */}
+          {selectedImage && (
+            <div className="h-72 rounded-xl overflow-hidden">
+              <img
+                src={selectedImage}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
 
-          <h1 className="text-2xl font-bold mb-2">
+          {/* Миниатюры */}
+          {images.length > 1 && (
+            <div className="flex gap-2">
+              {images.map((img) => (
+                <img
+                  key={img.id}
+                  src={img.image_url}
+                  onClick={() => setSelectedImage(img.image_url)}
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border ${
+                    selectedImage === img.image_url
+                      ? "border-black"
+                      : "border-transparent"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          <h1 className="text-2xl font-bold">
             {product.name}
           </h1>
 
-          <p className="text-gray-500 mb-1">
-            Бренд: {product.brand}
+          <p className="text-gray-500">
+            {product.brand}
           </p>
 
-          <p className="text-gray-500 mb-4">
-            Материал: {product.material}
-          </p>
-
-          <p className="text-xl font-semibold mb-6">
+          <p className="text-xl font-semibold">
             {product.price.toLocaleString()} ₽
           </p>
 
           {/* Размеры */}
-          {sizes.length > 0 && (
-            <div className="mb-6">
-              <h2 className="font-medium mb-2">
-                Выберите размер:
-              </h2>
-
-              <div className="flex flex-wrap gap-3">
-                {sizes.map((item) => (
-                  <button
-                    key={item.id}
-                    disabled={item.stock === 0}
-                    onClick={() => setSelectedSize(item.size)}
-                    className={`px-4 py-2 rounded-xl border transition
-                      ${
-                        selectedSize === item.size
-                          ? "bg-black text-white"
-                          : "bg-white"
-                      }
-                      ${
-                        item.stock === 0
-                          ? "opacity-40 cursor-not-allowed"
-                          : "hover:bg-gray-200"
-                      }
-                    `}
-                  >
-                    {item.size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mb-6">
+          <div>
             <h2 className="font-medium mb-2">
-              Описание:
+              Выберите размер:
             </h2>
-            <p className="text-gray-700">
-              {product.description}
-            </p>
+
+            <div className="flex flex-wrap gap-3">
+              {sizes.map((item) => (
+                <button
+                  key={item.id}
+                  disabled={item.stock === 0}
+                  onClick={() => setSelectedSize(item)}
+                  className={`px-4 py-2 rounded-xl border transition
+                    ${
+                      selectedSize?.id === item.id
+                        ? "bg-black text-white"
+                        : "bg-white"
+                    }
+                    ${
+                      item.stock === 0
+                        ? "opacity-40 cursor-not-allowed"
+                        : "hover:bg-gray-200"
+                    }
+                  `}
+                >
+                  {item.size}
+                </button>
+              ))}
+            </div>
           </div>
+
+          <p className="text-gray-700">
+            {product.description}
+          </p>
 
           <button
             onClick={handleAddToCart}
             disabled={!selectedSize}
-            className="w-full bg-black text-white py-3 rounded-xl font-medium hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50"
+            className="w-full bg-black text-white py-3 rounded-xl font-medium disabled:opacity-50"
           >
             Добавить в заказ
           </button>
 
         </div>
+
       </section>
     </main>
   );
