@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body>
+      <body className="bg-gradient-to-b from-gray-50 to-gray-200 min-h-screen">
         <CartProvider>{children}</CartProvider>
       </body>
     </html>

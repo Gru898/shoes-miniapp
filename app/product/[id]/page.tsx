@@ -19,7 +19,7 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <main className="min-h-screen bg-gray-100">
+      <main className="min-h-screen">
         <Header />
         <div className="flex items-center justify-center p-10">
           <div className="bg-white p-6 rounded-xl shadow">
@@ -44,37 +44,46 @@ export default function ProductPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen">
       <Header />
 
       <section className="max-w-4xl mx-auto p-4">
-        
+
         {/* Кнопка назад */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-4"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-4 transition"
         >
           <ArrowLeft size={18} />
           Назад
         </button>
 
-        <div className="bg-white rounded-2xl shadow p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+
+          {/* Фото */}
           <div className="h-72 bg-gray-200 rounded-xl mb-6"></div>
 
-          <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
+          {/* Название */}
+          <h1 className="text-2xl font-bold mb-2">
+            {product.name}
+          </h1>
 
+          {/* Бренд */}
           <p className="text-gray-500 mb-1">
             Бренд: {product.brand}
           </p>
 
+          {/* Материал */}
           <p className="text-gray-500 mb-4">
             Материал: {product.material}
           </p>
 
+          {/* Цена */}
           <p className="text-xl font-semibold mb-6">
             {product.price.toLocaleString()} ₽
           </p>
 
+          {/* Размеры */}
           <div className="mb-6">
             <h2 className="font-medium mb-2">
               Выберите размер:
@@ -105,6 +114,7 @@ export default function ProductPage() {
             </div>
           </div>
 
+          {/* Описание */}
           <div className="mb-6">
             <h2 className="font-medium mb-2">
               Описание:
@@ -114,13 +124,18 @@ export default function ProductPage() {
             </p>
           </div>
 
+          {/* Кнопка */}
           <button
             onClick={handleAddToCart}
             disabled={!selectedSize}
-            className="w-full bg-black text-white py-3 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-50"
+            className="w-full bg-black text-white py-3 rounded-xl font-medium
+            hover:scale-[1.02] active:scale-[0.98]
+            transition-transform duration-150
+            disabled:opacity-50"
           >
             Добавить в заказ
           </button>
+
         </div>
       </section>
     </main>
