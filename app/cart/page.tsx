@@ -48,7 +48,7 @@ export default function CartPage() {
     const managerUsername = "P1ngwinl"; // ← замени
 
     const orderText = `
-Новый заказ №${orderNumber}
+Заказ №${orderNumber}
 
 ${cart
   .map(
@@ -141,13 +141,13 @@ ${cart
               </button>
             </>
           )}
-
+          
           <button
-            onClick={() => router.push("/")}
-            className="mt-6 text-sm text-gray-500 hover:underline"
+          onClick={() => router.push("/")}
+          className="mt-6 w-full bg-gray-100 hover:bg-gray-200 py-3 rounded-xl transition"
           >
             ← Вернуться в каталог
-          </button>
+        </button>
 
         </div>
       </section>
