@@ -2,6 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
 
 export default function CartPage() {
   const { cart, removeFromCart } = useCart();
@@ -12,7 +13,7 @@ export default function CartPage() {
   const handleContactManager = () => {
     if (cart.length === 0) return;
 
-    const managerUsername = "P1ngwinl"; // ← ВСТАВИ СЮДА username БЕЗ @
+    const managerUsername = "manager_username"; // ← вставь username без @
 
     const orderText = `
 Новый заказ:
@@ -30,7 +31,6 @@ ${cart
 `;
 
     const encodedText = encodeURIComponent(orderText);
-
     const telegramUrl = `https://t.me/${managerUsername}?text=${encodedText}`;
 
     window.open(telegramUrl, "_blank");
@@ -38,12 +38,7 @@ ${cart
 
   return (
     <main className="min-h-screen bg-gray-100">
-      {/* Верхняя плашка */}
-      <header className="sticky top-0 z-50 bg-black text-white py-4 shadow-md">
-        <div className="max-w-6xl mx-auto px-4 text-center text-xl font-semibold tracking-wide">
-          НАЗВАНИЕ МАГАЗИНА
-        </div>
-      </header>
+      <Header />
 
       <section className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-2xl shadow p-6">
@@ -81,7 +76,6 @@ ${cart
                 ))}
               </div>
 
-              {/* Итог */}
               <div className="flex justify-between items-center mb-6">
                 <span className="text-lg font-medium">Итого:</span>
                 <span className="text-lg font-bold">
@@ -89,7 +83,6 @@ ${cart
                 </span>
               </div>
 
-              {/* Кнопка менеджера */}
               <button
                 onClick={handleContactManager}
                 className="w-full bg-black text-white py-3 rounded-xl font-medium hover:opacity-90 transition"

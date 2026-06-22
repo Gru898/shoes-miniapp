@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { products } from "@/data/products";
 import { useCart } from "@/context/CartContext";
+import Header from "@/components/Header";
 
 export default function ProductPage() {
   const params = useParams();
@@ -17,9 +18,12 @@ export default function ProductPage() {
 
   if (!product) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-6 rounded-xl shadow">
-          Товар не найден
+      <main className="min-h-screen bg-gray-100">
+        <Header />
+        <div className="flex items-center justify-center p-10">
+          <div className="bg-white p-6 rounded-xl shadow">
+            Товар не найден
+          </div>
         </div>
       </main>
     );
@@ -40,37 +44,26 @@ export default function ProductPage() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      {/* Верхняя плашка */}
-      <header className="sticky top-0 z-50 bg-black text-white py-4 shadow-md">
-        <div className="max-w-6xl mx-auto px-4 text-center text-xl font-semibold tracking-wide">
-          НАЗВАНИЕ МАГАЗИНА
-        </div>
-      </header>
+      <Header />
 
       <section className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-2xl shadow p-6">
-          {/* Фото */}
           <div className="h-72 bg-gray-200 rounded-xl mb-6"></div>
 
-          {/* Название */}
           <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
 
-          {/* Бренд */}
           <p className="text-gray-500 mb-1">
             Бренд: {product.brand}
           </p>
 
-          {/* Материал */}
           <p className="text-gray-500 mb-4">
             Материал: {product.material}
           </p>
 
-          {/* Цена */}
           <p className="text-xl font-semibold mb-6">
             {product.price.toLocaleString()} ₽
           </p>
 
-          {/* Размеры */}
           <div className="mb-6">
             <h2 className="font-medium mb-2">
               Выберите размер:
@@ -101,7 +94,6 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Описание */}
           <div className="mb-6">
             <h2 className="font-medium mb-2">
               Описание:
@@ -111,7 +103,6 @@ export default function ProductPage() {
             </p>
           </div>
 
-          {/* Кнопка */}
           <button
             onClick={handleAddToCart}
             disabled={!selectedSize}
