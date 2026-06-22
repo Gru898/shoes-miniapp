@@ -14,6 +14,7 @@ type Product = {
   brand: string;
   material: string;
   description: string;
+  image_url: string | null;
 };
 
 type Size = {
@@ -35,7 +36,7 @@ export default function ProductPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const [sizes, setSizes] = useState<Size[]>([]);
-  const [images, setImages] = useState<Image[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<Size | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,11 +64,17 @@ export default function ProductPage() {
 
     setProduct(productData);
     setSizes(sizeData || []);
-    setImages(imageData || []);
+
+    let allImages: string[] = [];
 
     if (imageData && imageData.length > 0) {
-      setSelectedImage(imageData[0].image_url);
+      allImages = imageData.map((img) => img.image_url);
+    } else if (productData?.image_url) {
+      allImages = [productData.image_url];
     }
+
+    setImages(allImages);
+    setSelectedImage(allImages[0] || null);
 
     setLoading(false);
   }
@@ -110,7 +117,6 @@ export default function ProductPage() {
 
         <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
 
-          {/* Главное фото */}
           {selectedImage && (
             <div className="h-72 rounded-xl overflow-hidden">
               <img
@@ -120,16 +126,15 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Миниатюры */}
           {images.length > 1 && (
             <div className="flex gap-2">
-              {images.map((img) => (
+              {images.map((img, index) => (
                 <img
-                  key={img.id}
-                  src={img.image_url}
-                  onClick={() => setSelectedImage(img.image_url)}
+                  key={index}
+                  src={img}
+                  onClick={() => setSelectedImage(img)}
                   className={`w-20 h-20 object-cover rounded cursor-pointer border ${
-                    selectedImage === img.image_url
+                    selectedImage === img
                       ? "border-black"
                       : "border-transparent"
                   }`}
@@ -150,7 +155,6 @@ export default function ProductPage() {
             {product.price.toLocaleString()} ₽
           </p>
 
-          {/* Размеры */}
           <div>
             <h2 className="font-medium mb-2">
               Выберите размер:
