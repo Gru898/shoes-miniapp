@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 type Product = {
   id: number;
@@ -60,32 +61,34 @@ export default function Home() {
                 </div>
               ))
             : products.map((product) => (
-                <div
+                <Link
                   key={product.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow"
+                  href={`/product/${product.id}`}
                 >
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition cursor-pointer">
+                    <div className="aspect-square overflow-hidden">
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-cover hover:scale-105 transition duration-300"
+                      />
+                    </div>
+
+                    <div className="p-4">
+                      <p className="text-xs text-gray-500 uppercase">
+                        {product.brand}
+                      </p>
+
+                      <h3 className="font-medium text-sm mb-2">
+                        {product.name}
+                      </h3>
+
+                      <p className="font-semibold">
+                        {product.price.toLocaleString()} ₽
+                      </p>
+                    </div>
                   </div>
-
-                  <div className="p-4">
-                    <p className="text-xs text-gray-500 uppercase">
-                      {product.brand}
-                    </p>
-
-                    <h3 className="font-medium text-sm mb-2">
-                      {product.name}
-                    </h3>
-
-                    <p className="font-semibold">
-                      {product.price.toLocaleString()} ₽
-                    </p>
-                  </div>
-                </div>
+                </Link>
               ))}
         </div>
       </section>
