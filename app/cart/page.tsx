@@ -45,7 +45,7 @@ export default function CartPage() {
       return;
     }
 
-    const managerUsername = "manager_username"; // ← замени
+    const managerUsername = "P1ngwinl"; // ← замени
 
     const orderText = `
 Новый заказ №${orderNumber}
