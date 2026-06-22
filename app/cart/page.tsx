@@ -16,7 +16,7 @@ export default function CartPage() {
   const handleContactManager = () => {
     if (cart.length === 0) return;
 
-    const managerUsername = "manager_username"; // ← замени на свой
+    const managerUsername = "P1ngwinl"; // ← замени на свой
 
     const orderText = `
 Новый заказ:
