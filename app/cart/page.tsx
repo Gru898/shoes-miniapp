@@ -1,25 +1,54 @@
 "use client";
 
+import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
+import { supabase } from "@/lib/supabase";
 
 export default function CartPage() {
   const { cart, removeFromCart, clearCart } = useCart();
   const router = useRouter();
+  const [toast, setToast] = useState("");
 
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price,
     0
   );
 
-  const handleContactManager = () => {
+  function generateOrderNumber() {
+    return "ORD-" + Math.floor(100000 + Math.random() * 900000);
+  }
+
+  async function handleContactManager() {
     if (cart.length === 0) return;
 
-    const managerUsername = "P1ngwinl"; // ← замени на свой
+    const confirmed = confirm(
+      "Подтвердить отправку заказа менеджеру?"
+    );
+
+    if (!confirmed) return;
+
+    const orderNumber = generateOrderNumber();
+
+    // ✅ Сохраняем заказ в базу
+    const { error } = await supabase.from("orders").insert([
+      {
+        order_number: orderNumber,
+        items: cart,
+        total_price: totalPrice,
+      },
+    ]);
+
+    if (error) {
+      alert("Ошибка сохранения заказа");
+      return;
+    }
+
+    const managerUsername = "manager_username"; // ← замени
 
     const orderText = `
-Новый заказ:
+Новый заказ №${orderNumber}
 
 ${cart
   .map(
@@ -36,15 +65,20 @@ ${cart
     const encodedText = encodeURIComponent(orderText);
     const telegramUrl = `https://t.me/${managerUsername}?text=${encodedText}`;
 
-    // ✅ Открываем чат
     window.open(telegramUrl, "_blank");
 
-    // ✅ Очищаем корзину
     clearCart();
-  };
+
+    setToast(`✅ Заказ №${orderNumber} отправлен`);
+
+    setTimeout(() => {
+      setToast("");
+      router.push("/");
+    }, 2500);
+  }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative">
       <Header />
 
       <section className="max-w-4xl mx-auto p-4">
@@ -117,6 +151,13 @@ ${cart
 
         </div>
       </section>
+
+      {/* ✅ Toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-xl shadow-lg">
+          {toast}
+        </div>
+      )}
     </main>
   );
 }
