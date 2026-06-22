@@ -17,6 +17,12 @@ type Product = {
   image_url: string;
 };
 
+type Size = {
+  id: number;
+  size: number;
+  stock: number;
+};
+
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
@@ -25,25 +31,32 @@ export default function ProductPage() {
   const productId = Number(params.id);
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [sizes, setSizes] = useState<Size[]>([]);
+  const [selectedSize, setSelectedSize] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProduct();
+    fetchSizes();
   }, []);
 
   async function fetchProduct() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("products")
       .select("*")
       .eq("id", productId)
       .single();
 
-    if (error) {
-      console.error(error);
-    } else {
-      setProduct(data);
-    }
+    setProduct(data);
+  }
 
+  async function fetchSizes() {
+    const { data } = await supabase
+      .from("product_sizes")
+      .select("*")
+      .eq("product_id", productId);
+
+    setSizes(data || []);
     setLoading(false);
   }
 
@@ -66,11 +79,13 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = () => {
+    if (!selectedSize) return;
+
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
-      size: 0, // пока без размеров из базы
+      size: selectedSize,
     });
 
     router.push("/cart");
@@ -116,6 +131,39 @@ export default function ProductPage() {
             {product.price.toLocaleString()} ₽
           </p>
 
+          {/* Размеры */}
+          {sizes.length > 0 && (
+            <div className="mb-6">
+              <h2 className="font-medium mb-2">
+                Выберите размер:
+              </h2>
+
+              <div className="flex flex-wrap gap-3">
+                {sizes.map((item) => (
+                  <button
+                    key={item.id}
+                    disabled={item.stock === 0}
+                    onClick={() => setSelectedSize(item.size)}
+                    className={`px-4 py-2 rounded-xl border transition
+                      ${
+                        selectedSize === item.size
+                          ? "bg-black text-white"
+                          : "bg-white"
+                      }
+                      ${
+                        item.stock === 0
+                          ? "opacity-40 cursor-not-allowed"
+                          : "hover:bg-gray-200"
+                      }
+                    `}
+                  >
+                    {item.size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mb-6">
             <h2 className="font-medium mb-2">
               Описание:
@@ -127,7 +175,8 @@ export default function ProductPage() {
 
           <button
             onClick={handleAddToCart}
-            className="w-full bg-black text-white py-3 rounded-xl font-medium hover:scale-[1.02] active:scale-[0.98] transition-transform"
+            disabled={!selectedSize}
+            className="w-full bg-black text-white py-3 rounded-xl font-medium hover:scale-[1.02] active:scale-[0.98] transition-transform disabled:opacity-50"
           >
             Добавить в заказ
           </button>
