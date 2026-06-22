@@ -28,7 +28,7 @@ export default function Home() {
     if (error) {
       console.error(error);
     } else {
-      setProducts(data);
+      setProducts(data || []);
     }
 
     setLoading(false);
@@ -39,47 +39,55 @@ export default function Home() {
       <Header />
 
       <section className="max-w-6xl mx-auto px-4 py-6">
-
         <h2 className="text-xl font-semibold mb-6">
           Каталог
         </h2>
 
-        {loading ? (
-          <p>Загрузка...</p>
-        ) : products.length === 0 ? (
-          <p>Товары не найдены</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-2xl overflow-hidden shadow"
-              >
-                <div className="aspect-square overflow-hidden">
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
+        <div className="grid grid-cols-2 gap-4">
+
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-2xl overflow-hidden shadow animate-pulse"
+                >
+                  <div className="aspect-square bg-gray-300"></div>
+                  <div className="p-4 space-y-2">
+                    <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+                    <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+                    <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+                  </div>
                 </div>
+              ))
+            : products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow"
+                >
+                  <div className="aspect-square overflow-hidden">
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                <div className="p-4">
-                  <p className="text-xs text-gray-500 uppercase">
-                    {product.brand}
-                  </p>
+                  <div className="p-4">
+                    <p className="text-xs text-gray-500 uppercase">
+                      {product.brand}
+                    </p>
 
-                  <h3 className="font-medium text-sm mb-2">
-                    {product.name}
-                  </h3>
+                    <h3 className="font-medium text-sm mb-2">
+                      {product.name}
+                    </h3>
 
-                  <p className="font-semibold">
-                    {product.price.toLocaleString()} ₽
-                  </p>
+                    <p className="font-semibold">
+                      {product.price.toLocaleString()} ₽
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+        </div>
       </section>
     </main>
   );
