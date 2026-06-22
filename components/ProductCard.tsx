@@ -4,11 +4,15 @@ import { Product } from "@/data/products";
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/product/${product.id}`}>
-      <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer animate-fadeIn">
+      <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer">
         
         {/* Фото */}
-        <div className="aspect-square bg-gray-200 overflow-hidden">
-          <div className="w-full h-full bg-gray-300 group-hover:scale-105 transition-transform duration-500" />
+        <div className="aspect-square overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
         </div>
 
         {/* Информация */}

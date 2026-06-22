@@ -5,6 +5,7 @@ export type Product = {
   brand: string;
   material: string;
   description: string;
+  image: string;
   sizes: {
     size: number;
     stock: number;
@@ -20,6 +21,7 @@ export const products: Product[] = [
     material: "Текстиль",
     description:
       "Легендарная модель Nike Air Max 97 с современным силуэтом и отличной амортизацией.",
+    image: "/images/nike.jpg",
     sizes: [
       { size: 40, stock: 2 },
       { size: 41, stock: 0 },
@@ -35,6 +37,7 @@ export const products: Product[] = [
     material: "Замша",
     description:
       "Классическая модель Adidas Campus в минималистичном стиле для повседневной носки.",
+    image: "/images/adidas.jpg",
     sizes: [
       { size: 40, stock: 3 },
       { size: 41, stock: 2 },

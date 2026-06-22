@@ -61,7 +61,13 @@ export default function ProductPage() {
         <div className="bg-white rounded-2xl shadow-lg p-6">
 
           {/* Фото */}
-          <div className="h-72 bg-gray-200 rounded-xl mb-6"></div>
+        <div className="h-72 rounded-xl overflow-hidden mb-6">
+            <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            />
+        </div>
 
           {/* Название */}
           <h1 className="text-2xl font-bold mb-2">
