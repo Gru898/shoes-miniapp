@@ -114,11 +114,11 @@ ${cart
                         {item.price.toLocaleString()} ₽
                       </p>
                       <button
-                        onClick={() => removeFromCart(index)}
-                        className="text-sm text-red-500 hover:underline"
+                      onClick={() => removeFromCart(index)}
+                      className="mt-1 inline-block bg-red-100 text-red-600 text-xs px-3 py-1 rounded-lg hover:bg-red-200 active:scale-95 transition"
                       >
                         Удалить
-                      </button>
+                        </button>
                     </div>
                   </div>
                 ))}
