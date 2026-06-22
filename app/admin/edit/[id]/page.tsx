@@ -33,6 +33,8 @@ export default function EditProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [sizes, setSizes] = useState<Size[]>([]);
   const [images, setImages] = useState<Image[]>([]);
+  const [newSize, setNewSize] = useState("");
+  const [newStock, setNewStock] = useState("");
   const [newImage, setNewImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -62,6 +64,70 @@ export default function EditProductPage() {
     setImages(imageData || []);
     setLoading(false);
   }
+
+  async function updateProduct() {
+    if (!product) return;
+
+    await supabase
+      .from("products")
+      .update({
+        name: product.name,
+        price: product.price,
+        brand: product.brand,
+        material: product.material,
+        description: product.description,
+      })
+      .eq("id", productId);
+
+    alert("Сохранено ✅");
+  }
+
+  async function deleteProduct() {
+    if (!confirm("Удалить товар полностью?")) return;
+
+    await supabase.from("products").delete().eq("id", productId);
+
+    alert("Товар удалён ✅");
+    router.push("/admin");
+  }
+
+  // ---------- Размеры ----------
+
+  async function addSize() {
+    if (!newSize || !newStock) return;
+
+    await supabase.from("product_sizes").insert([
+      {
+        product_id: productId,
+        size: Number(newSize),
+        stock: Number(newStock),
+      },
+    ]);
+
+    setNewSize("");
+    setNewStock("");
+    fetchAll();
+  }
+
+  async function updateSize(sizeId: number, stock: number) {
+    await supabase
+      .from("product_sizes")
+      .update({ stock })
+      .eq("id", sizeId);
+
+    fetchAll();
+  }
+
+  async function deleteSize(sizeId: number) {
+    await supabase
+      .from("product_sizes")
+      .delete()
+      .eq("id", sizeId);
+
+    fetchAll();
+  }
+
+  // ---------- Фото ----------
 
   async function uploadImage() {
     if (!newImage) return;
@@ -97,23 +163,6 @@ export default function EditProductPage() {
     fetchAll();
   }
 
-  async function updateProduct() {
-    if (!product) return;
-
-    await supabase
-      .from("products")
-      .update({
-        name: product.name,
-        price: product.price,
-        brand: product.brand,
-        material: product.material,
-        description: product.description,
-      })
-      .eq("id", productId);
-
-    alert("Сохранено ✅");
-  }
-
   if (loading || !product) {
     return (
       <main className="min-h-screen">
@@ -133,6 +182,7 @@ export default function EditProductPage() {
           Редактирование товара
         </h1>
 
+        {/* Основные данные */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
 
           <input
@@ -167,12 +217,68 @@ export default function EditProductPage() {
             Сохранить
           </button>
 
+          <button
+            onClick={deleteProduct}
+            className="w-full bg-red-600 text-white py-2 rounded"
+          >
+            Удалить товар
+          </button>
+
+        </div>
+
+        {/* Размеры */}
+        <div className="bg-white rounded-2xl shadow p-6 space-y-4">
+          <h2 className="font-medium">Размеры</h2>
+
+          {sizes.map((s) => (
+            <div key={s.id} className="flex justify-between items-center">
+              <span>Размер {s.size}</span>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={s.stock}
+                  onChange={(e) =>
+                    updateSize(s.id, Number(e.target.value))
+                  }
+                  className="w-20 border p-1 rounded"
+                />
+                <button
+                  onClick={() => deleteSize(s.id)}
+                  className="text-red-600 text-sm"
+                >
+                  Удалить
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <div className="flex gap-2 pt-4">
+            <input
+              type="number"
+              placeholder="Размер"
+              value={newSize}
+              onChange={(e) => setNewSize(e.target.value)}
+              className="border p-2 rounded w-1/2"
+            />
+            <input
+              type="number"
+              placeholder="Количество"
+              value={newStock}
+              onChange={(e) => setNewStock(e.target.value)}
+              className="border p-2 rounded w-1/2"
+            />
+            <button
+              onClick={addSize}
+              className="bg-gray-200 px-3 rounded"
+            >
+              +
+            </button>
+          </div>
         </div>
 
         {/* Фото */}
         <div className="bg-white rounded-2xl shadow p-6 space-y-4">
-
-          <h2 className="font-medium">Фото товара</h2>
+          <h2 className="font-medium">Фото</h2>
 
           <div className="grid grid-cols-3 gap-3">
             {images.map((img) => (
@@ -204,7 +310,6 @@ export default function EditProductPage() {
           >
             Добавить фото
           </button>
-
         </div>
 
         <button
