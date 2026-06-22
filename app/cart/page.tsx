@@ -5,15 +5,18 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 
 export default function CartPage() {
-  const { cart, removeFromCart } = useCart();
+  const { cart, removeFromCart, clearCart } = useCart();
   const router = useRouter();
 
-  const totalPrice = cart.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.price,
+    0
+  );
 
   const handleContactManager = () => {
     if (cart.length === 0) return;
 
-    const managerUsername = "P1ngwinl"; // ← вставь username без @
+    const managerUsername = "manager_username"; // ← замени на свой
 
     const orderText = `
 Новый заказ:
@@ -33,19 +36,28 @@ ${cart
     const encodedText = encodeURIComponent(orderText);
     const telegramUrl = `https://t.me/${managerUsername}?text=${encodedText}`;
 
+    // ✅ Открываем чат
     window.open(telegramUrl, "_blank");
+
+    // ✅ Очищаем корзину
+    clearCart();
   };
 
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen">
       <Header />
 
       <section className="max-w-4xl mx-auto p-4">
         <div className="bg-white rounded-2xl shadow p-6">
-          <h1 className="text-2xl font-bold mb-6">Мой заказ</h1>
+
+          <h1 className="text-2xl font-bold mb-6">
+            Мой заказ
+          </h1>
 
           {cart.length === 0 ? (
-            <p className="text-gray-500">Корзина пуста</p>
+            <p className="text-gray-500">
+              Корзина пуста
+            </p>
           ) : (
             <>
               <div className="space-y-4 mb-6">
@@ -55,7 +67,9 @@ ${cart
                     className="flex justify-between items-center border-b pb-3"
                   >
                     <div>
-                      <p className="font-medium">{item.name}</p>
+                      <p className="font-medium">
+                        {item.name}
+                      </p>
                       <p className="text-sm text-gray-500">
                         Размер: {item.size}
                       </p>
@@ -77,7 +91,9 @@ ${cart
               </div>
 
               <div className="flex justify-between items-center mb-6">
-                <span className="text-lg font-medium">Итого:</span>
+                <span className="text-lg font-medium">
+                  Итого:
+                </span>
                 <span className="text-lg font-bold">
                   {totalPrice.toLocaleString()} ₽
                 </span>
@@ -98,6 +114,7 @@ ${cart
           >
             ← Вернуться в каталог
           </button>
+
         </div>
       </section>
     </main>
